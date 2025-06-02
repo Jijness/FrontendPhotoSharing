@@ -132,7 +132,7 @@ function UserPhotos() {
         <Card key={photo._id} sx={{ mb: 3 }}>
           <CardMedia
             component="img"
-            image={`http://localhost:8081/images/${photo.file_name}`}
+            image={`https://46p98n-8081.csb.app/images/${photo.file_name}`}
             alt="User photo"
             sx={{
               width: "auto",
