@@ -23,7 +23,7 @@ function UserList() {
     const fetchUsers = async () => {
       try {
         const usersData = await fetchModel(
-          "http://localhost:8081/api/user/list"
+          "https://46p98n-8081.csb.app/api/user/list"
         );
         setUsers(usersData);
         setLoading(false);

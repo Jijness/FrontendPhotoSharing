@@ -19,7 +19,7 @@ function UserDetail() {
       setLoading(true);
       setError(null);
       try {
-        const url = `http://localhost:8081/api/user/${userId}`;
+        const url = `https://46p98n-8081.csb.app/api/user/${userId}`;
         const userData = await fetchModel(url);
         setUser(userData);
         setLoading(false);
@@ -40,7 +40,11 @@ function UserDetail() {
 
   return (
     <div>
-      <Typography variant="body1" component="h2" sx={{ fontWeight: "bold", mb: 2 }}>
+      <Typography
+        variant="body1"
+        component="h2"
+        sx={{ fontWeight: "bold", mb: 2 }}
+      >
         {user.first_name} {user.last_name}
       </Typography>
       <Typography variant="body1">Location: {user.location}</Typography>
@@ -50,7 +54,8 @@ function UserDetail() {
       <Button
         component={Link}
         to={`/photos/${user._id}`}
-        variant="contained" color="primary"
+        variant="contained"
+        color="primary"
         sx={{ mt: 2 }}
       >
         View Photos
