@@ -1,0 +1,16 @@
+
+.comment-item {
+    margin-bottom: 8px; /* Khoảng cách giữa các comment */
+    padding-left: 12px; /* Padding bên trái */
+    border-left: 3px solid #1976d2; /* Đường kẻ xanh bên trái */
+    background-color: #f0f8ff; /* Màu nền nhẹ */
+    border-radius: 4px; /* Bo góc nhẹ */
+}
+.comment-author-link {
+    font-weight: bold;
+    color: #3f51b5; /* Màu link */
+    text-decoration: none;
+}
+.comment-author-link:hover {
+    text-decoration: underline;
+}

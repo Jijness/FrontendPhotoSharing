@@ -1,0 +1,11 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+.main-topbar-buffer {
+  height: 64px;
+}
+
+.main-grid-item {
+  padding: 16px;
+}
