@@ -40,24 +40,14 @@ function UserDetail() {
 
   return (
     <div>
-      <Typography
-        variant="body1"
-        component="h2"
-        sx={{ fontWeight: "bold", mb: 2 }}
-      >
+      <Typography variant="body1" component="h2" sx={{ fontWeight: "bold", mb: 2 }}>
         {user.first_name} {user.last_name}
       </Typography>
       <Typography variant="body1">Location: {user.location}</Typography>
       <Typography variant="body1">Description: {user.description}</Typography>
       <Typography variant="body1">Occupation: {user.occupation}</Typography>
 
-      <Button
-        component={Link}
-        to={`/photos/${user._id}`}
-        variant="contained"
-        color="primary"
-        sx={{ mt: 2 }}
-      >
+      <Button component={Link} to={`/photos/${user._id}`} variant="contained" color="primary" sx={{ mt: 2 }}>
         View Photos
       </Button>
     </div>

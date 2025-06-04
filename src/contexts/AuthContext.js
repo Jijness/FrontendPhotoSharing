@@ -74,8 +74,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={authContextValue}>
-      {authReady ? children : <div>Loading...</div>}{" "}
-      {/* children là các component được bọc bởi AuthProvider */}
+      {authReady ? children : <div>Loading...</div>} {/* children là các component được bọc bởi AuthProvider */}
     </AuthContext.Provider>
   );
 };

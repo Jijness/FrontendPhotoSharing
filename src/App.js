@@ -1,11 +1,6 @@
 import React, { useContext } from "react";
 import { Grid, Typography, Paper } from "@mui/material";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
 import TopBar from "./components/TopBar";
 import UserDetail from "./components/UserDetail";
@@ -51,16 +46,7 @@ const AppContent = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/"
-                element={
-                  isLoggedIn ? (
-                    <Navigate to={`/users/${user._id}`} replace />
-                  ) : (
-                    <Navigate to="/login" replace />
-                  )
-                }
-              />
+              <Route path="/" element={isLoggedIn ? <Navigate to={`/users/${user._id}`} replace /> : <Navigate to="/login" replace />} />
               <Route path="/users" element={<UserList />} />
               <Route
                 path="/users/:userId"
@@ -72,16 +58,7 @@ const AppContent = () => {
               />
               <Route path="/photos/:userId" element={<UserPhotos />} />
 
-              <Route
-                path="*"
-                element={
-                  isLoggedIn ? (
-                    <Typography variant="h5">404: Page Not Found</Typography>
-                  ) : (
-                    <Navigate to="/login" replace />
-                  )
-                }
-              />
+              <Route path="*" element={isLoggedIn ? <Typography variant="h5">404: Page Not Found</Typography> : <Navigate to="/login" replace />} />
             </Routes>
           </Paper>
         </Grid>

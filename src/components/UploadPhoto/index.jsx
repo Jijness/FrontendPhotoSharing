@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Typography,
-  Box,
-  Paper,
-  Button,
-  Alert,
-  CircularProgress,
-} from "@mui/material";
+import { Typography, Box, Paper, Button, Alert, CircularProgress } from "@mui/material";
 
 import { AuthContext } from "../../contexts/AuthContext";
 import fetchModel from "../../lib/fetchModelData";
@@ -53,14 +46,11 @@ function UploadPhoto() {
     formData.append("photo", selectedFile);
 
     try {
-      const response = await fetchModel(
-        "https://46p98n-8081.csb.app/api/photo/new",
-        {
-          method: "POST",
-          body: formData,
-          auth: true,
-        }
-      );
+      const response = await fetchModel("https://46p98n-8081.csb.app/api/photo/new", {
+        method: "POST",
+        body: formData,
+        auth: true,
+      });
       setMessage({ text: "Photo uploaded successfully!", type: "success" });
       setSelectedFile(null);
       setPreviewUrl(null);
@@ -93,13 +83,7 @@ function UploadPhoto() {
           gap: 2,
         }}
       >
-        <input
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          id="raise-file"
-          onChange={handleFileChange}
-        />
+        <input type="file" accept="image/*" style={{ display: "none" }} id="raise-file" onChange={handleFileChange} />
         <label htmlFor="raise-file">
           <Button variant="contained" component="span">
             {selectedFile ? "Change Photo" : "Choose Photo"}
@@ -126,13 +110,7 @@ function UploadPhoto() {
         )}
 
         {/* Nut upload */}
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-          onClick={handleUpload}
-          disabled={!selectedFile}
-        >
+        <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleUpload} disabled={!selectedFile}>
           {loading === true ? "Loading..." : "Upload Photo"}
         </Button>
       </Paper>

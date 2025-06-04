@@ -1,15 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
-import {
-  Button,
-  TextField,
-  Typography,
-  Box,
-  Paper,
-  Alert,
-  Tabs,
-  Tab,
-} from "@mui/material";
+import { Button, TextField, Typography, Box, Paper, Alert, Tabs, Tab } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 
@@ -49,17 +40,14 @@ const LoginRegister = () => {
   const onLoginSubmit = async (data) => {
     setloginError("");
     try {
-      const response = await fetch(
-        "https://46p98n-8081.csb.app/api/user/admin/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            login_name: data.login_name,
-            password: data.password,
-          }),
-        }
-      );
+      const response = await fetch("https://46p98n-8081.csb.app/api/user/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          login_name: data.login_name,
+          password: data.password,
+        }),
+      });
       const responseData = await response.json();
       if (!response.ok) {
         setloginError(responseData.message || "Login failed");
@@ -94,9 +82,7 @@ const LoginRegister = () => {
       if (!response.ok) {
         setRegisterError(responseData.message || "Registration failed");
       } else {
-        setRegisterSuccess(
-          `User ${responseData.login_name} registered successfully! You can now log in.`
-        );
+        setRegisterSuccess(`User ${responseData.login_name} registered successfully! You can now log in.`);
         resetRegisterForm();
         setTabIndex(0);
       }
@@ -113,22 +99,13 @@ const LoginRegister = () => {
           Photo Sharing App
         </Typography>
 
-        <Tabs
-          value={tabIndex}
-          onChange={handleTabChange}
-          centered
-          sx={{ mb: 3 }}
-        >
+        <Tabs value={tabIndex} onChange={handleTabChange} centered sx={{ mb: 3 }}>
           <Tab label="Login" />
           <Tab label="Register" />
         </Tabs>
 
         {tabIndex === 0 && ( // UI cho login
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleLoginSubmit(onLoginSubmit)}
-          >
+          <Box component="form" noValidate onSubmit={handleLoginSubmit(onLoginSubmit)}>
             <Typography varient="h6" gutterBottom>
               Login
             </Typography>
@@ -143,39 +120,20 @@ const LoginRegister = () => {
               error={!!loginErrors.login_name}
               helperText={loginErrors.login_name?.message}
             />
-            <TextField
-              label="Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              {...loginForm("password", { required: "Password is required" })}
-              error={!!loginErrors.password}
-              helperText={loginErrors.password?.message}
-            />
+            <TextField label="Password" type="password" variant="outlined" fullWidth margin="normal" {...loginForm("password", { required: "Password is required" })} error={!!loginErrors.password} helperText={loginErrors.password?.message} />
             {loginError && (
               <Alert severity="error" sx={{ mt: 2 }}>
                 {loginError}
               </Alert>
             )}
-            <Button
-              type="submit"
-              varient="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 3 }}
-            >
+            <Button type="submit" varient="contained" color="primary" fullWidth sx={{ mt: 3 }}>
               Login
             </Button>
           </Box>
         )}
 
         {tabIndex === 1 && ( // UI cho register
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleRegisterSubmit(onRegisterSubmit)}
-          >
+          <Box component="form" noValidate onSubmit={handleRegisterSubmit(onRegisterSubmit)}>
             <Typography varient="h6" gutterBottom>
               Register new user
             </Typography>
@@ -214,8 +172,7 @@ const LoginRegister = () => {
               margin="normal"
               {...registerForm("confirm_password", {
                 required: "Password is required",
-                validate: (value) =>
-                  value === getValues("password") || "Passwords do not match",
+                validate: (value) => value === getValues("password") || "Passwords do not match",
               })}
               error={!!registerErrors.confirm_password}
               helperText={registerErrors.confirm_password?.message}
@@ -242,27 +199,9 @@ const LoginRegister = () => {
               error={!!registerErrors.last_name}
               helperText={registerErrors.last_name?.message}
             />
-            <TextField
-              label="Location"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              {...registerForm("location")}
-            />
-            <TextField
-              label="Description"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              {...registerForm("description")}
-            />
-            <TextField
-              label="Occupation"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              {...registerForm("occupation")}
-            />
+            <TextField label="Location" variant="outlined" fullWidth margin="normal" {...registerForm("location")} />
+            <TextField label="Description" variant="outlined" fullWidth margin="normal" {...registerForm("description")} />
+            <TextField label="Occupation" variant="outlined" fullWidth margin="normal" {...registerForm("occupation")} />
 
             {registerError && (
               <Alert severity="error" sx={{ mt: 2 }}>
@@ -274,13 +213,7 @@ const LoginRegister = () => {
                 {registerSuccess}
               </Alert>
             )}
-            <Button
-              type="submit"
-              varient="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 3 }}
-            >
+            <Button type="submit" varient="contained" color="primary" fullWidth sx={{ mt: 3 }}>
               Register
             </Button>
           </Box>

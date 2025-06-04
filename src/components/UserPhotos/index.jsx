@@ -1,15 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
-import {
-  Typography,
-  Card,
-  CardMedia,
-  CardContent,
-  Button,
-  TextField,
-  Box,
-  Paper,
-} from "@mui/material";
-
+import { Typography, Card, CardMedia, CardContent, Button, TextField, Box, Paper, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams } from "react-router-dom";
 import models from "../../modelData/models";
 import { Link } from "react-router-dom";
@@ -30,33 +21,32 @@ function formatDate(dateStr) {
 function UserPhotos() {
   const { userId } = useParams();
   const [photos, setPhotos] = useState([]);
-  const { isLoggedIn, user } = useContext(AuthContext);
+  const { isLoggedIn, user, authReady } = useContext(AuthContext);
   const [commentInput, setCommentInput] = useState();
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const url = `https://46p98n-8081.csb.app/api/photo/${userId}`;
-        const photosData = await fetchModel(url);
+  const fetchPhotos = async () => {
+    try {
+      const url = `https://46p98n-8081.csb.app/api/photo/${userId}`;
+      const photosData = await fetchModel(url);
 
-        if (photosData) {
-          setPhotos(photosData);
-          const initCommentsData = {};
-          photosData.forEach((photo) => {
-            initCommentsData[photo._id] = "";
-          });
-          setCommentInput(initCommentsData);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user photos:", err);
-        setPhotos([]);
+      if (photosData) {
+        setPhotos(photosData);
+        const initCommentsData = {};
+        photosData.forEach((photo) => {
+          initCommentsData[photo._id] = "";
+        });
+        setCommentInput(initCommentsData);
       }
-    };
-
+    } catch (err) {
+      console.error("Failed to fetch user photos:", err);
+      setPhotos([]);
+    }
+  };
+  useEffect(() => {
     if (userId) {
       fetchPhotos();
     }
-  }, [userId]);
+  }, [userId, isLoggedIn, authReady]);
 
   const handleCommentsInputChange = (photoId, event) => {
     setCommentInput((prev) => ({
@@ -74,37 +64,16 @@ function UserPhotos() {
       return;
     }
     try {
-      const response = await fetchModel(
-        `https://46p98n-8081.csb.app/api/photo/commentsOfPhoto/${photoId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            comment: commentInput[photoId],
-          }),
-          auth: true,
-        }
-      );
+      const response = await fetchModel(`https://46p98n-8081.csb.app/api/photo/commentsOfPhoto/${photoId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          comment: commentInput[photoId],
+        }),
+        auth: true,
+      });
       if (response && response.newComment) {
-        const updatePhotos = photos.map((photo) => {
-          if (photo._id === photoId) {
-            return {
-              ...photo,
-              comments: [
-                ...(photo.comments || []),
-                {
-                  _id: response.newComment._id,
-                  comment: response.newComment.comment,
-                  date_time: response.newComment.date_time,
-                  user: response.newComment.user_id,
-                },
-              ],
-            };
-          }
-          return photo;
-        });
-        console.log("Updated photos:", updatePhotos);
-        setPhotos(updatePhotos);
+        fetchPhotos();
         // xoa comment input sau khi add thanh cong
         setCommentInput((prev) => ({ ...prev, [photoId]: "" }));
       } else {
@@ -115,16 +84,16 @@ function UserPhotos() {
       alert("Error adding comment. Please try again.");
     }
   };
+  const handleDeletePhoto = async () => {
+    if (!window.confirm("Delete this photo?")) {
+      return;
+    }
+  };
   // image={`https://46p98n-8081.csb.app/images/${photo.file_name}`}
   return (
     <div>
       {photos.length === 0 && (
-        <Typography
-          variant="h6"
-          color="textSecondary"
-          align="center"
-          sx={{ mt: 4 }}
-        >
+        <Typography variant="h6" color="textSecondary" align="center" sx={{ mt: 4 }}>
           Have no photos yet.
         </Typography>
       )}
@@ -139,41 +108,35 @@ function UserPhotos() {
               maxWidth: "80%",
               height: "auto",
               objectFit: "contain",
-              alignItems: "center",
             }}
           />
           <CardContent>
-            <Typography variant="body2">
-              Date on: {formatDate(photo.date_time)}
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                color="textSecondary"
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Typography variant="body2">Date on: {formatDate(photo.date_time)}</Typography>
+              <Box
+                sx={{
+                  visibility: isLoggedIn && user._id === photo.user_id ? "visible" : "hidden",
+                  pointerEvents: isLoggedIn && user._id === photo.user_id ? "auto" : "none",
+                }}
               >
+                <IconButton color="waring" onClick={() => handleDeletePhoto(photo._id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Box>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1" gutterBottom color="textSecondary">
                 Comments:
               </Typography>
               {photo.comments && photo.comments.length > 0 ? (
                 photo.comments?.map((comment) => (
-                  <Paper
-                    key={comment._id}
-                    elevation={1}
-                    sx={{ mb: 1, borderLeft: "3px solid #1976d2", pl: 1 }}
-                  >
+                  <Paper key={comment._id} elevation={1} sx={{ mb: 1, borderLeft: "3px solid #1976d2", pl: 1 }}>
                     <Typography variant="subtitle2" component="span">
-                      <Link
-                        to={`/users/${comment.user._id}`}
-                        style={{ textDecoration: "none", color: "#1976d2" }}
-                      >
+                      <Link to={`/users/${comment.user._id}`} style={{ textDecoration: "none", color: "#1976d2" }}>
                         {comment.user.first_name} {comment.user.last_name}
                       </Link>
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      display="block"
-                      color="textSecondary"
-                    >
+                    <Typography variant="caption" display="block" color="textSecondary">
                       {formatDate(comment.date_time)}
                     </Typography>
                     <Typography variant="body2">{comment.comment}</Typography>
@@ -188,21 +151,8 @@ function UserPhotos() {
 
             {isLoggedIn && (
               <Box sx={{ mt: 2 }}>
-                <TextField
-                  label="Add a comment"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mr: 1 }}
-                  value={commentInput[photo._id] || ""}
-                  onChange={(e) => handleCommentsInputChange(photo._id, e)}
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleAddComment(photo._id)}
-                  disabled={!commentInput[photo._id]?.trim()}
-                >
+                <TextField label="Add a comment" variant="outlined" size="small" fullWidth sx={{ mr: 1 }} value={commentInput[photo._id] || ""} onChange={(e) => handleCommentsInputChange(photo._id, e)} />
+                <Button variant="contained" color="primary" onClick={handleAddComment(photo._id)} disabled={!commentInput[photo._id]?.trim()}>
                   Send
                 </Button>
               </Box>

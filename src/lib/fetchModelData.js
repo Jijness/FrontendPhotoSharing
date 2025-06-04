@@ -1,4 +1,3 @@
-
 /**
  * fetchModel - Fetch a model from the web server.
  *
@@ -12,15 +11,15 @@ function fetchModel(url, options = {}) {
     const token = localStorage.getItem("token");
     const headers = { ...options.headers };
     if (token && options.auth) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
-    if (!headers['Content-Type'] && !(options.body instanceof FormData)) {
-      headers['Content-Type'] = 'application/json';
+    if (!headers["Content-Type"] && !(options.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
     }
     const fetchOptions = {
       ...options, // lay tat ca tuy chon tu options (method, body,...)
       headers: headers,
-    }
+    };
 
     // fetch request voi header
     fetch(url, fetchOptions)
