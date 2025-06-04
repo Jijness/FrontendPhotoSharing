@@ -1,6 +1,11 @@
 import React, { useContext } from "react";
 import { Grid, Typography, Paper } from "@mui/material";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 
 import TopBar from "./components/TopBar";
 import UserDetail from "./components/UserDetail";
@@ -13,14 +18,14 @@ import { AuthContext, AuthProvider } from "./contexts/AuthContext";
 
 const AppContent = () => {
   // Lay trang thai dang nhap va thong tin user
-  const { isLoggedIn, user } = useContext(AuthContext);
+  const { isLoggedIn, user, authReady } = useContext(AuthContext);
   // Component protected route yeu cau login
   const ProtectedRoute = ({ children }) => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !authReady) {
       return <Navigate to="/login" replace />;
     }
     return children; // login roi thi hien thi component con
-  }
+  };
 
   return (
     <div className="app-container">
@@ -38,22 +43,45 @@ const AppContent = () => {
           <Paper className="main-grid-item">
             <Routes>
               <Route path="/login" element={<LoginRegister />} />
-              <Route path="/photos/new" element={
-                <ProtectedRoute><UploadPhoto /></ProtectedRoute>
-              } />
-              <Route path="/" element={
-                isLoggedIn ? <Navigate to={`/users/${user._id}`} replace /> : <LoginRegister />
-              } />
+              <Route
+                path="/photos/new"
+                element={
+                  <ProtectedRoute>
+                    <UploadPhoto />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/"
+                element={
+                  isLoggedIn ? (
+                    <Navigate to={`/users/${user._id}`} replace />
+                  ) : (
+                    <Navigate to="/login" replace />
+                  )
+                }
+              />
               <Route path="/users" element={<UserList />} />
-              <Route path="/users/:userId" element={
-                <ProtectedRoute> <UserDetail /> </ProtectedRoute>
-              } />
+              <Route
+                path="/users/:userId"
+                element={
+                  <ProtectedRoute>
+                    <UserDetail />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/photos/:userId" element={<UserPhotos />} />
-              
 
-              <Route path="*" element={
-                isLoggedIn ? <Typography variant="h5">404: Page Not Found</Typography> : <Navigate to="/login" replace />
-              } />
+              <Route
+                path="*"
+                element={
+                  isLoggedIn ? (
+                    <Typography variant="h5">404: Page Not Found</Typography>
+                  ) : (
+                    <Navigate to="/login" replace />
+                  )
+                }
+              />
             </Routes>
           </Paper>
         </Grid>
@@ -70,7 +98,7 @@ const App = () => {
         <AppContent />
       </AuthProvider>
     </Router>
-  )
-}
+  );
+};
 
 export default App;
