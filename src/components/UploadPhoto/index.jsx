@@ -46,7 +46,7 @@ function UploadPhoto() {
     formData.append("photo", selectedFile);
 
     try {
-      const response = await fetchModel("https://46p98n-8081.csb.app/api/photo/new", {
+      const response = await fetchModel("https://82rysc-8081.csb.app/api/photo/new", {
         method: "POST",
         body: formData,
         auth: true,

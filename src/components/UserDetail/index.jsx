@@ -19,7 +19,7 @@ function UserDetail() {
       setLoading(true);
       setError(null);
       try {
-        const url = `https://46p98n-8081.csb.app/api/user/${userId}`;
+        const url = `https://82rysc-8081.csb.app/api/user/${userId}`;
         const userData = await fetchModel(url);
         setUser(userData);
         setLoading(false);

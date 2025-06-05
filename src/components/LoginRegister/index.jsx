@@ -40,7 +40,7 @@ const LoginRegister = () => {
   const onLoginSubmit = async (data) => {
     setloginError("");
     try {
-      const response = await fetch("https://46p98n-8081.csb.app/api/user/admin/login", {
+      const response = await fetch("https://82rysc-8081.csb.app/api/user/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,7 +65,7 @@ const LoginRegister = () => {
     setRegisterError("");
     setRegisterSuccess("");
     try {
-      const response = await fetch("https://46p98n-8081.csb.app/api/user", {
+      const response = await fetch("https://82rysc-8081.csb.app/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

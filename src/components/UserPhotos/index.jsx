@@ -26,7 +26,7 @@ function UserPhotos() {
 
   const fetchPhotos = async () => {
     try {
-      const url = `https://46p98n-8081.csb.app/api/photo/${userId}`;
+      const url = `https://82rysc-8081.csb.app/api/photo/${userId}`;
       const photosData = await fetchModel(url);
 
       if (photosData) {
@@ -64,7 +64,7 @@ function UserPhotos() {
       return;
     }
     try {
-      const response = await fetchModel(`https://46p98n-8081.csb.app/api/photo/commentsOfPhoto/${photoId}`, {
+      const response = await fetchModel(`https://82rysc-8081.csb.app/api/photo/commentsOfPhoto/${photoId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -89,7 +89,7 @@ function UserPhotos() {
       return;
     }
   };
-  // image={`https://46p98n-8081.csb.app/images/${photo.file_name}`}
+  // image={`https://82rysc-8081.csb.app/images/${photo.file_name}`}
   return (
     <div>
       {photos.length === 0 && (
@@ -101,7 +101,7 @@ function UserPhotos() {
         <Card key={photo._id} sx={{ mb: 3 }}>
           <CardMedia
             component="img"
-            image={`https://46p98n-8081.csb.app/images/${photo.file_name}`}
+            image={`https://82rysc-8081.csb.app/images/${photo.file_name}`}
             alt="User photo"
             sx={{
               width: "auto",
@@ -115,7 +115,7 @@ function UserPhotos() {
               <Typography variant="body2">Date on: {formatDate(photo.date_time)}</Typography>
               <Box
                 sx={{
-                  visibility: isLoggedIn && user._id === photo.user_id ? "visible" : "hidden",
+                  visibility: isLoggedIn && user._id === photo.user_id ? "hidden" : "hidden",
                   pointerEvents: isLoggedIn && user._id === photo.user_id ? "auto" : "none",
                 }}
               >

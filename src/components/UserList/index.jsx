@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  Link as LinkUI,
-} from "@mui/material";
+import { Divider, List, ListItem, ListItemText, Typography, Link as LinkUI } from "@mui/material";
 import models from "../../modelData/models";
 import { Link } from "react-router-dom";
 import fetchModel from "../../lib/fetchModelData";
@@ -22,9 +15,7 @@ function UserList() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const usersData = await fetchModel(
-          "https://46p98n-8081.csb.app/api/user/list"
-        );
+        const usersData = await fetchModel("https://82rysc-8081.csb.app/api/user/list");
         setUsers(usersData);
         setLoading(false);
       } catch (err) {
@@ -40,11 +31,7 @@ function UserList() {
     <div>
       <List component="nav">
         {users.map((item) => (
-          <Link
-            key={item._id}
-            to={`/users/${item._id}`}
-            style={{ textDecoration: "none" }}
-          >
+          <Link key={item._id} to={`/users/${item._id}`} style={{ textDecoration: "none" }}>
             <ListItem button>
               <ListItemText primary={`${item.first_name} ${item.last_name}`} />
             </ListItem>
