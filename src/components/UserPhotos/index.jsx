@@ -101,6 +101,28 @@ function UserPhotos() {
       alert(`Error deleting photo: ${err}`);
     }
   }
+  // Trong UserPhotos.jsx, sau hàm handleDeletePhoto
+  const handleDeleteComment = async (photoId, commentId) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) {
+      return;
+    }
+    try {
+      const response = await fetchModel(`http://localhost:8081/api/photo/comments/<span class="math-inline">\{photoId\}/</span>{commentId}`, {
+        method: "DELETE",
+        auth: true
+      });
+
+      if (response.message) {
+        alert(response.message);
+        fetchPhotos(); // Tải lại ảnh để cập nhật comment
+      } else {
+        alert("Failed to delete comment.");
+      }
+    } catch (err) {
+      console.error("Error deleting comment:", err);
+      alert(`Error deleting comment: ${err.message || err}`);
+    }
+  };
   // image={`http://localhost:8081/images/${photo.file_name}`}
   return (
     <div>
@@ -114,7 +136,7 @@ function UserPhotos() {
             image={`http://localhost:8081/images/${photo.file_name}`}
             alt="User photo"
             sx={{
-              width: "auto", maxWidth: "80%", height: "auto",
+              width: "auto", maxWidth: "80%", height: "auto", maxHeight: "500px",
               objectFit: "contain",
             }}
           />
@@ -124,8 +146,8 @@ function UserPhotos() {
                 Date on: {formatDate(photo.date_time)}
               </Typography>
               <Box sx={{
-                visibility: isLoggedIn && user._id === photo.user_id ? 'visible': 'hidden', 
-                pointerEvents:isLoggedIn && user._id === photo.user_id ? 'auto' : 'none',
+                visibility: isLoggedIn && user._id === photo.user_id ? 'visible' : 'hidden',
+                pointerEvents: isLoggedIn && user._id === photo.user_id ? 'auto' : 'none',
               }}>
                 <IconButton color='warning'
                   onClick={() => handleDeletePhoto(photo._id)}>
@@ -138,16 +160,26 @@ function UserPhotos() {
               <Typography variant="subtitle1" gutterBottom color="textSecondary">Comments:</Typography>
               {(photo.comments && photo.comments.length > 0) ? (
                 photo.comments?.map((comment) => (
-                  <Paper key={comment._id} elevation={1} sx={{ mb: 1, borderLeft: '3px solid #1976d2', pl: 1 }}>
-                    <Typography variant="subtitle2" component="span">
-                      <Link to={`/users/${comment.user._id}`} style={{ textDecoration: 'none', color: '#1976d2' }}>
-                        {comment.user.first_name} {comment.user.last_name}
-                      </Link>
-                    </Typography>
-                    <Typography variant="caption" display="block" color="textSecondary">
-                      {formatDate(comment.date_time)}
-                    </Typography>
-                    <Typography variant="body2">{comment.comment}</Typography>
+                  <Paper key={comment._id} elevation={1} sx={{ mb: 1, borderLeft: '3px solid #1976d2', pl: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ flexGrow: 1 }}> {/* Bao bọc nội dung comment để nút xóa không đẩy chữ ra */}
+                      <Typography variant="subtitle2" component="span">
+                        <Link to={`/users/${comment.user._id}`} style={{ textDecoration: 'none', color: '#1976d2' }}>
+                          {comment.user.first_name} {comment.user.last_name}
+                        </Link>
+                      </Typography>
+                      <Typography variant="caption" display="block" color="textSecondary">
+                        {formatDate(comment.date_time)}
+                      </Typography>
+                      <Typography variant="body2">{comment.comment}</Typography>
+                    </Box>
+                    {isLoggedIn && user && user._id === comment.user._id && ( // Chỉ hiện nút xóa nếu là comment của chính mình
+                      <IconButton
+                        aria-label="delete comment" size="small" color="error"
+                        onClick={() => handleDeleteComment(photo._id, comment._id)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    )}
                   </Paper>
                 ))
               ) : (
