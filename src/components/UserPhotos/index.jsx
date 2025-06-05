@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Typography, Card, CardMedia, CardContent, Button, TextField, Box, Paper } from "@mui/material";
-
+import { Typography, Card, CardMedia, CardContent, Button, TextField, Box, Paper, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams } from "react-router-dom";
-import models from "../../modelData/models";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import fetchModel from "../../lib/fetchModelData";
 import './styles.css';
@@ -22,33 +21,33 @@ function formatDate(dateStr) {
 function UserPhotos() {
   const { userId } = useParams();
   const [photos, setPhotos] = useState([]);
-  const { isLoggedIn, user } = useContext(AuthContext);
+  const { isLoggedIn, user, authReady } = useContext(AuthContext);
   const [commentInput, setCommentInput] = useState();
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const url = `http://localhost:8081/api/photo/${userId}`;
-        const photosData = await fetchModel(url);
 
-        if (photosData) {
-          setPhotos(photosData);
-          const initCommentsData = {};
-          photosData.forEach(photo => {
-            initCommentsData[photo._id] = '';
-          });
-          setCommentInput(initCommentsData);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user photos:", err);
-        setPhotos([]);
+  const fetchPhotos = async () => {
+    try {
+      const url = `http://localhost:8081/api/photo/${userId}`;
+      const photosData = await fetchModel(url);
+
+      if (photosData) {
+        setPhotos(photosData);
+        const initCommentsData = {};
+        photosData.forEach(photo => {
+          initCommentsData[photo._id] = '';
+        });
+        setCommentInput(initCommentsData);
       }
-    };
-
+    } catch (err) {
+      console.error("Failed to fetch user photos:", err);
+      setPhotos([]);
+    }
+  };
+  useEffect(() => {
     if (userId) {
       fetchPhotos();
     }
-  }, [userId]);
+  }, [userId, isLoggedIn, authReady]);
 
   const handleCommentsInputChange = (photoId, event) => {
     setCommentInput(prev => ({
@@ -75,36 +74,37 @@ function UserPhotos() {
         auth: true
       });
       if (response && response.newComment) {
-        const updatePhotos = photos.map(photo => {
-          if (photo._id === photoId) {
-            return {
-              ...photo,
-              comments: [...(photo.comments || []), {
-                _id: response.newComment._id,
-                comment: response.newComment.comment,
-                date_time: response.newComment.date_time,
-                user: response.newComment.user_id
-              }]
-            };
-          }
-          return photo;
-        });
-        console.log("Updated photos:", updatePhotos);
-        setPhotos(updatePhotos);
+        fetchPhotos();
         // xoa comment input sau khi add thanh cong
         setCommentInput(prev => ({ ...prev, [photoId]: '' }));
       } else {
-        alert(response.message || "Failed to add comment");
+        alert(response.message || "Failed to add comment, please login again");
       }
     } catch (err) {
       console.error("Error adding comment:", err);
       alert("Error adding comment. Please try again.");
     }
   }
-// image={`http://localhost:8081/images/${photo.file_name}`}
+
+  const handleDeletePhoto = async (photoId) => {
+    if (!window.confirm("Delete this photo?")) {
+      return;
+    }
+    try {
+      const response = await fetchModel(`http://localhost:8081/api/photo/${photoId}`, {
+        method: "DELETE",
+        auth: true
+      })
+      alert("Photo deleted");
+      fetchPhotos();
+    } catch (err) {
+      alert(`Error deleting photo: ${err}`);
+    }
+  }
+  // image={`http://localhost:8081/images/${photo.file_name}`}
   return (
     <div>
-      {photos.length === 0 && (
+      {!photos || photos.length === 0 && (
         <Typography variant="h6" color="textSecondary" align="center" sx={{ mt: 4 }}>Have no photos yet.</Typography>
       )}
       {photos.map((photo) => (
@@ -116,13 +116,24 @@ function UserPhotos() {
             sx={{
               width: "auto", maxWidth: "80%", height: "auto",
               objectFit: "contain",
-              alignItems: 'center'
             }}
           />
           <CardContent>
-            <Typography variant="body2">
-              Date on: {formatDate(photo.date_time)}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography variant="body2">
+                Date on: {formatDate(photo.date_time)}
+              </Typography>
+              <Box sx={{
+                visibility: isLoggedIn && user._id === photo.user_id ? 'visible': 'hidden', 
+                pointerEvents:isLoggedIn && user._id === photo.user_id ? 'auto' : 'none',
+              }}>
+                <IconButton color='warning'
+                  onClick={() => handleDeletePhoto(photo._id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Box>
+
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle1" gutterBottom color="textSecondary">Comments:</Typography>
               {(photo.comments && photo.comments.length > 0) ? (

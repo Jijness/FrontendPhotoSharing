@@ -13,10 +13,10 @@ import { AuthContext, AuthProvider } from "./contexts/AuthContext";
 
 const AppContent = () => {
   // Lay trang thai dang nhap va thong tin user
-  const { isLoggedIn, user } = useContext(AuthContext);
+  const { isLoggedIn, user, authReady } = useContext(AuthContext);
   // Component protected route yeu cau login
   const ProtectedRoute = ({ children }) => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !authReady) {
       return <Navigate to="/login" replace />;
     }
     return children; // login roi thi hien thi component con
@@ -42,14 +42,14 @@ const AppContent = () => {
                 <ProtectedRoute><UploadPhoto /></ProtectedRoute>
               } />
               <Route path="/" element={
-                isLoggedIn ? <Navigate to={`/users/${user._id}`} replace /> : <LoginRegister />
+                isLoggedIn ? <Navigate to={`/users/${user._id}`} replace /> : <Navigate to={"/login"} replace />
               } />
               <Route path="/users" element={<UserList />} />
               <Route path="/users/:userId" element={
                 <ProtectedRoute> <UserDetail /> </ProtectedRoute>
               } />
               <Route path="/photos/:userId" element={<UserPhotos />} />
-              
+
 
               <Route path="*" element={
                 isLoggedIn ? <Typography variant="h5">404: Page Not Found</Typography> : <Navigate to="/login" replace />

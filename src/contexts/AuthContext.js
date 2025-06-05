@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import fetchModel from "../lib/fetchModelData";
 
 // Tạo context object, các component sử dụng để đọc/ghi dữ liệu
 // Giá trị mặc định là null, sẽ được ghi đè bởi Provider
@@ -13,6 +12,7 @@ export const AuthProvider = ({ children }) => {
     // sate luu token JWT
     const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
     const [userId, setUserId] = useState(localStorage.getItem('userId'));
+    const [authReady, setAuthReady] = useState(false);
 
     const login = (userData, token) => {
         localStorage.setItem('token', token);
@@ -35,15 +35,28 @@ export const AuthProvider = ({ children }) => {
     // chay lan dau mount va khi token thay doi
     useEffect(() => {
         if (authToken && userId) {
+            const storedToken = localStorage.getItem('token');
+            const storedUserId = localStorage.getItem('userId');
             try {
                 const decodedToken = JSON.parse(atob(authToken.split('.')[1]));
-                setUser({
-                    _id: decodedToken._id,
-                    first_name: decodedToken.first_name,
-                    last_name: decodedToken.last_name,
-                    login_name: decodedToken.login_name,
-                });
-                setIsLoggedIn(true);
+                const currentTime = Date.now(); 
+                console.log(decodedToken.exp);
+                if (decodedToken.exp * 1000 < currentTime) {
+                    console.log("Token expired!")
+                    logout();
+                    return;
+                } else {
+                    console.log('Token remains');
+                    setUser({
+                        _id: decodedToken._id,
+                        first_name: decodedToken.first_name,
+                        last_name: decodedToken.last_name,
+                        login_name: decodedToken.login_name,
+                    });
+                    setIsLoggedIn(true);
+                    setAuthToken(storedToken);
+                    setUserId(storedUserId);
+                }
             } catch (err) {
                 console.error("Error decoding token on startup:", err);
                 logout();
@@ -51,18 +64,20 @@ export const AuthProvider = ({ children }) => {
         } else {
             logout();
         }
-    }, [authToken, userId]);
+        setAuthReady(true);
+    }, []);
 
     const authContextValue = {
         user,
         isLoggedIn,
         login,
-        logout
+        logout,
+        authReady,
     };
 
     return (
         <AuthContext.Provider value={authContextValue}>
-            {children} {/* children là các component được bọc bởi AuthProvider */}
+            {authReady? children : <div>Loading...</div>}
         </AuthContext.Provider>
     )
 }

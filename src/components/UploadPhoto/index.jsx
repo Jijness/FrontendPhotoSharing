@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import { Typography, Box, Paper, Button, Alert, CircularProgress } from "@mui/material";
 
 import { AuthContext } from '../../contexts/AuthContext';
@@ -7,21 +6,10 @@ import fetchModel from "../../lib/fetchModelData";
 
 function UploadPhoto() {
     const { isLoggedIn, user } = useContext(AuthContext);
-    const navigate = useNavigate();
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState(null);
-
-    // Giai phong URL khi component unmount hoac khi previewUrl thay doi
-    useEffect(() => {
-        return () => {
-            if (previewUrl) {
-                URL.revokeObjectURL(previewUrl);
-            }
-        }
-    }, [previewUrl]);
+    const [error, setError] = useState();
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -29,69 +17,51 @@ function UploadPhoto() {
             if (previewUrl) {
                 URL.revokeObjectURL(previewUrl); // Giai phong URL cu
             }
+            console.log("File:", file);
             setSelectedFile(file);
             setPreviewUrl(URL.createObjectURL(file));
-            setMessage(null);
         }
     }
 
     const handleUpload = async () => {
         if (!selectedFile) {
-            setMessage({ text: "Please select a file to upload", type: 'error' });
+            setError("Please select a file to upload");
             return;
         }
-        setLoading(true);
-        setMessage(null);
         const formData = new FormData();
         formData.append('photo', selectedFile);
-
         try {
             const response = await fetchModel('http://localhost:8081/api/photo/new', {
                 method: 'POST',
                 body: formData,
                 auth: true
             });
-            setMessage({ text: "Photo uploaded successfully!", type: 'success' });
-            setSelectedFile(null);
-            setPreviewUrl(null);
-
-            setTimeout(() => {
-                navigate(`/photos/${user._id}`);
-            }, 3000);
+            if (response) {
+                console.log("Uploaded photo!")
+                setSelectedFile(null);
+                setPreviewUrl(null);
+                setError(null);
+            }
         } catch (err) {
             console.error("Error uploading photo:", err);
-            setMessage({ text: "Error uploading photo", type: 'error' });
-        }finally{
-            setLoading(false);
+            setError("Error when uploading photo");
         }
-    }
+    };
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom>Upload Your new photo</Typography>
+        <div>
+            <Typography variant="h5" gutterBottom>Upload your new photo</Typography>
 
             <Paper elevation={3} sx={{ p: 3, mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                <input type="file" accept="image/*"
-                    style={{ display: 'none' }}
-                    id="raise-file"
-                    onChange={handleFileChange}
-                />
-                <label htmlFor="raise-file">
-                    <Button variant="contained" component="span">
-                        {selectedFile ? "Change Photo" : "Choose Photo"}
-                    </Button>
-                </label>
-
+                <Button variant="contained" component="label">
+                    Choose Photo
+                    <input hidden type="file" accept="image/*" onChange={handleFileChange} />
+                </Button>
                 {/* Hien thi preview anh up len */}
                 {previewUrl && (
-                    <Box sx={{ mt: 2, textAlign: 'center' }}>
-                        <Typography variant="subtitle1" gutterBottom>
-                            Preview:
-                        </Typography>
-                        <img src={previewUrl} alt="Preview"
-                            style={{ maxWidth: '80%', maxHeight: '300px', objectFit: 'contain', border: '1px solid #ccc' }}
-                        />
-                    </Box>
+                    <img src={previewUrl} alt="Preview"
+                        style={{ maxWidth: '80%', maxHeight: '300px', objectFit: 'contain', border: '1px solid #ccc' }}
+                    />
                 )}
 
                 {/* Nut upload */}
@@ -99,10 +69,14 @@ function UploadPhoto() {
                     onClick={handleUpload}
                     disabled={!selectedFile}
                 >
-                    {loading === true ? "Loading..." : "Upload Photo"}
+                    UpLoad Photo
                 </Button>
+
+                {error && (
+                    <div>{error}</div>
+                )}
             </Paper>
-        </Box >
+        </div>
     )
 }
 

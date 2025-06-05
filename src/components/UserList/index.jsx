@@ -40,8 +40,8 @@ function UserList() {
     <div>
       <List component="nav">
         {users.map((item) => (
-          <Link to={`/users/${item._id}`} style={{ textDecoration: "none" }}>
-            <ListItem button>
+          <Link key={item._id} to={`/users/${item._id}`} style={{ textDecoration: "none" }}>
+            <ListItem button >
               <ListItemText primary={`${item.first_name} ${item.last_name}`} />
             </ListItem>
             <Divider />
